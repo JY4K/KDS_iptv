@@ -4,60 +4,110 @@
     "channels": [
         {
             "name": "CCTV1 综合",
-            "page": "cctv-general-channel/"
+            "page": "cctv-general-channel"
         },
         {
             "name": "CCTV2 财经",
-            "page": "cctv-economic-life-and-service-channel/"
+            "page": "cctv-economic-life-and-service-channel"
         },
         {
             "name": "CCTV3 综艺",
-            "page": "china-central-television-channel-3/"
+            "page": "china-central-television-channel-3"
         },
         {
             "name": "CCTV4 中文国际",
-            "page": "cctv-4-chinese-international/"
+            "page": "cctv-4-chinese-international"
         },
         {
             "name": "CCTV5 体育",
-            "page": "cctv-5-sports/"
+            "page": "cctv-5-sports"
         },
         {
           "name": "CCTV5+ 体育赛事",
-          "page": "cctv-5-sports-plus/"
+          "page": "cctv-5-sports-plus"
       },
         {
             "name": "CCTV6 电影",
-            "page": "china-movie-channel/"
+            "page": "china-movie-channel"
         },
         {
             "name": "CCTV7 国防军事",
-            "page": "china-central-television-defense-and-military-channel/"
+            "page": "china-central-television-defense-and-military-channel"
         },
         {
             "name": "CCTV8 电视剧",
-            "page": "cctv-8-drama/"
+            "page": "cctv-8-drama"
         },
         {
             "name": "CCTV10 科教",
-            "page": "cctv-science-and-education-channel/"
+            "page": "cctv-science-and-education-channel"
         },
         {
             "name": "CCTV11 戏曲",
-            "page": "cctv-11/"
+            "page": "cctv-11"
         },
         {
             "name": "CCTV13 新闻",
-            "page": "cctv13/"
+            "page": "cctv13"
         },
         {
             "name": "CCTV14 少儿",
-            "page": "cctv-14-childrens-channel/"
+            "page": "cctv-14-childrens-channel"
         },
         {
             "name": "CCTV15 音乐",
-            "page": "cctv-15-music/"
+            "page": "cctv-15-music"
+        }
+    ]
+  },
+  {
+    "group-title": "卫视频道",
+    "channels": [
+        {
+          "name": "北京卫视",
+          "page": "brtv"
+        },
+        {
+            "name": "四川卫视",
+            "page": "sichuan-satellite-tv"
+        },
+        {
+            "name": "深圳卫视",
+            "page": "shenzhen-satellite-tv"
+        },
+        {
+            "name": "东方卫视",
+            "page": "dragon-television"
+        },
+        {
+            "name": "东南卫视",
+            "page": "fujian-satellite-tv"
+        },
+        {
+            "name": "广东卫视",
+            "page": "grt-satellite-channel"
+        },
+        {
+            "name": "广西卫视",
+            "page": "guangxi-satellite-tv"
+        },
+        {
+            "name": "江苏卫视",
+            "page": "jiangsu-satellite-tv"
+        },
+        {
+            "name": "湖南卫视",
+            "page": "hunan-satellite-tv"
+        },
+        {
+            "name": "浙江卫视",
+            "page": "zhejiang-satellite-tv"
+        },
+        {
+            "name": "CGTN",
+            "page": "cgtn"
         }
     ]
   }
 ]
+
