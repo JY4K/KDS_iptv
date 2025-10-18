@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify
+from flask import Flask, Response, jsonify, stream_with_context
 import json
 import re
 import requests
@@ -167,75 +167,73 @@ def process_channel(channel):
         logger.error(f"爬取失败: {channel.get('name', 'Unknown')} - {str(e)}")
         return (channel.get('name', 'Unknown'), None)
 
-# 爬虫主控制器
-# 协调整个爬取流程，使用多线程处理，包括数据读取、并发控制和结果整合
-def run_spider():
-    logger.info("开始运行爬虫")
+# 流式爬虫控制器
+# 实现边爬取边输出的功能
+def stream_spider():
+    logger.info("开始运行流式爬虫")
     start_time = time.time()
     
     # 读取频道数据
     data = read_channels_json()
     
-    # 收集所有需要处理的频道
-    channels_to_process = []
-    for group in data[:1]:  # 只处理第一个分组
-        channels_to_process.extend(group['channels'][:MAX_CHANNELS])
+    # 存储已处理的频道URL
+    processed_channels = {}
     
-    # 存储频道URL映射的字典
-    channel_urls = {}
-    
-    # 在Vercel环境中减少并发数，避免资源限制
-    max_workers = min(5, len(channels_to_process))  # 减少线程数，适应Vercel无服务器环境
-    logger.info(f"使用多线程并发处理，线程数: {max_workers}")
-    
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # 提交所有任务
-        future_to_channel = {executor.submit(process_channel, channel): channel for channel in channels_to_process}
+    # 遍历每个分组
+    for i, group in enumerate(data):
+        # 在不是第一个分组时，添加两个换行符作为分隔
+        if i > 0:
+            yield '\n'
+            yield '\n'
+            
+        group_title = group.get('group-title')
+        # 输出分类行
+        yield f"{group_title},#genre#\n"
         
-        # 获取结果
-        for future in concurrent.futures.as_completed(future_to_channel):
-            name, url = future.result()
-            if url:
-                channel_urls[name] = url
-    
-    # 构建结果
-    # 从channels.json的group-title中动态获取频道组名
-    group_title = data[0].get('group-title')
-    results = [f"{group_title},#genre#"]  # 添加分类行
-    
-    # 遍历原始数据结构，保持原始顺序
-    for group in data[:1]:
-        for channel in group['channels'][:MAX_CHANNELS]:
-            name = channel['name']
-            if name in channel_urls:
-                results.append(f"{name},{channel_urls[name]}")
-            else:
-                # 标记无法获取的频道
-                results.append(f"{name},#ERROR#")
-    
-    # 将结果转换为文本
-    live_content = '\n'.join(results)
+        # 获取该分组的频道
+        channels = group['channels'][:MAX_CHANNELS]
+        
+        # 在Vercel环境中减少并发数，避免资源限制
+        max_workers = min(5, len(channels))
+        
+        # 使用线程池处理该分组的所有频道
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # 提交所有任务
+            future_to_channel = {executor.submit(process_channel, channel): channel for channel in channels}
+            
+            # 一旦有结果就立即输出
+            for future in concurrent.futures.as_completed(future_to_channel):
+                name, url = future.result()
+                if url:
+                    processed_channels[name] = url
+                    # 立即输出获取到的频道信息
+                    yield f"{name},{url}\n"
+                else:
+                    # 标记无法获取的频道
+                    yield f"{name},#ERROR#\n"
     
     end_time = time.time()
-    logger.info(f"爬取完成！耗时: {end_time - start_time:.2f}秒，共获取{len(channel_urls)}个频道的URL")
-    
-    return live_content
+    logger.info(f"爬取完成！耗时: {end_time - start_time:.2f}秒，共获取{len(processed_channels)}个频道的URL")
+
+# 保留原有的run_spider函数供其他地方调用
+def run_spider():
+    # 收集所有输出
+    output_lines = []
+    for line in stream_spider():
+        output_lines.append(line.rstrip('\n'))
+    return '\n'.join(output_lines)
 
 # 直播源文件接口
-# 返回直播源文件内容，直接在浏览器中显示而不是下载
+# 返回直播源文件内容，使用流式响应实现边爬取边显示
 @app.route('/live.txt')
 def get_live_file():
     try:
-        # 运行爬虫获取最新内容
-        live_content = run_spider()
-        
-        # 返回文本内容，直接在浏览器中显示
+        # 使用流式响应，设置stream_with_context=True支持流式处理
         return Response(
-            live_content,
+            stream_with_context(stream_spider()),
             mimetype='text/plain',
             headers={
                 'Content-Disposition': 'inline',
-                'Content-Length': str(len(live_content)),
                 'Cache-Control': 'no-cache'
             }
         )
