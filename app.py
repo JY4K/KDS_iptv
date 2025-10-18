@@ -193,17 +193,12 @@ def stream_spider():
         # 获取该分组的频道
         channels = group['channels'][:MAX_CHANNELS]
         
-        # 在Vercel环境中减少并发数，避免资源限制
-        max_workers = min(5, len(channels))
-        
-        # 使用线程池处理该分组的所有频道
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            # 提交所有任务
-            future_to_channel = {executor.submit(process_channel, channel): channel for channel in channels}
-            
-            # 一旦有结果就立即输出
-            for future in concurrent.futures.as_completed(future_to_channel):
-                name, url = future.result()
+        # 判断是否为央视频道分组
+        if group_title == "央视频道":
+            logger.info("央视频道分组，按顺序处理")
+            # 央视频道按顺序处理，逐个执行
+            for channel in channels:
+                name, url = process_channel(channel)
                 if url:
                     processed_channels[name] = url
                     # 立即输出获取到的频道信息
@@ -211,6 +206,27 @@ def stream_spider():
                 else:
                     # 标记无法获取的频道
                     yield f"{name},#ERROR#\n"
+        else:
+            logger.info(f"{group_title}分组，并行实时处理")
+            # 对于其他分组（如卫视频道），使用线程池并行处理并实时返回
+            # 在Vercel环境中减少并发数，避免资源限制
+            max_workers = min(5, len(channels))
+            
+            # 使用线程池处理该分组的所有频道
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                # 提交所有任务
+                future_to_channel = {executor.submit(process_channel, channel): channel for channel in channels}
+                
+                # 一旦有结果就立即输出
+                for future in concurrent.futures.as_completed(future_to_channel):
+                    name, url = future.result()
+                    if url:
+                        processed_channels[name] = url
+                        # 立即输出获取到的频道信息
+                        yield f"{name},{url}\n"
+                    else:
+                        # 标记无法获取的频道
+                        yield f"{name},#ERROR#\n"
     
     end_time = time.time()
     logger.info(f"爬取完成！耗时: {end_time - start_time:.2f}秒，共获取{len(processed_channels)}个频道的URL")
