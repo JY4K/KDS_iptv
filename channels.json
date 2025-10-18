@@ -1,0 +1,63 @@
+[
+  {
+    "group-title": "央视频道",
+    "channels": [
+        {
+            "name": "CCTV1 综合",
+            "page": "cctv-general-channel/"
+        },
+        {
+            "name": "CCTV2 财经",
+            "page": "cctv-economic-life-and-service-channel/"
+        },
+        {
+            "name": "CCTV3 综艺",
+            "page": "china-central-television-channel-3/"
+        },
+        {
+            "name": "CCTV4 中文国际",
+            "page": "cctv-4-chinese-international/"
+        },
+        {
+            "name": "CCTV5 体育",
+            "page": "cctv-5-sports/"
+        },
+        {
+          "name": "CCTV5+ 体育赛事",
+          "page": "cctv-5-sports-plus/"
+      },
+        {
+            "name": "CCTV6 电影",
+            "page": "china-movie-channel/"
+        },
+        {
+            "name": "CCTV7 国防军事",
+            "page": "china-central-television-defense-and-military-channel/"
+        },
+        {
+            "name": "CCTV8 电视剧",
+            "page": "cctv-8-drama/"
+        },
+        {
+            "name": "CCTV10 科教",
+            "page": "cctv-science-and-education-channel/"
+        },
+        {
+            "name": "CCTV11 戏曲",
+            "page": "cctv-11/"
+        },
+        {
+            "name": "CCTV13 新闻",
+            "page": "cctv13/"
+        },
+        {
+            "name": "CCTV14 少儿",
+            "page": "cctv-14-childrens-channel/"
+        },
+        {
+            "name": "CCTV15 音乐",
+            "page": "cctv-15-music/"
+        }
+    ]
+  }
+]
